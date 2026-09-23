@@ -27,11 +27,17 @@ SANS_BOLD = "/usr/share/fonts/gsfonts/NimbusSans-Bold.otf"
 BUFFER = min(W, H) * 0.0926           # 100 at 1080p
 CELL = (min(W, H) - BUFFER * 2) / 10  # 88
 BASE = CELL * 0.30      # chrome text
-DIGIT = CELL * 0.46     # the field's digits are much larger
+DIGIT = CELL * 0.38     # the field's digits, larger than the chrome
+BAR_H = 26              # the desktop bar the header must clear
+TOP_INSET = BAR_H + 10
+HEADER_H = 72
+FIELD_TOP = TOP_INSET + HEADER_H + 18
+FOOTER_H = 148          # bins plus coordinates, with room to breathe
+FIELD_BOTTOM = H - FOOTER_H
 COLS = int(W // CELL)
-ROWS = int((H - BUFFER * 2) // CELL)
+ROWS = int((FIELD_BOTTOM - FIELD_TOP) // CELL)
 ORIGIN_X = (W - COLS * CELL) / 2
-ORIGIN_Y = BUFFER
+ORIGIN_Y = FIELD_TOP
 
 PROGRESS = 0.0
 FILE_NAME = "Dranesville"
@@ -78,8 +84,8 @@ for r in range(ROWS):
                  str(random.randint(0, 9))]
 
 # ---- field rules, drawn as close-set pairs --------------------------------
-for y, alpha in ((BUFFER, 0.85), (BUFFER + 3, 0.35),
-                 (H - BUFFER, 0.85), (H - BUFFER + 3, 0.35)):
+for y, alpha in ((FIELD_TOP - 10, 0.85), (FIELD_TOP - 7, 0.35),
+                 (FIELD_BOTTOM + 10, 0.85), (FIELD_BOTTOM + 13, 0.35)):
     args += ["-stroke", rgba(FG, alpha), "-strokewidth", "1", "-fill", "none",
              "-draw", f"line 0,{y:.0f} {W},{y:.0f}"]
 
@@ -92,10 +98,10 @@ FILE_NAME = "Dranesville"
 
 box_w = W * 0.9
 box_x = (W - box_w) / 2
-box_y, box_h = 12, 76
+box_y, box_h = TOP_INSET, HEADER_H
 inner = 3
 
-logo_h = box_h * 1.3   # fits inside the top buffer
+logo_h = box_h * 1.16  # slightly proud of the box, still clear of the bar
 logo_w = logo_h * 2.05
 logo_x = W - logo_w - 12          # sits at the screen edge, clear of the text
 logo_y = box_y + box_h / 2 - logo_h / 2
@@ -146,34 +152,47 @@ for f in (-0.46, 0.46):
     y = cy + b * f
     half = a * math.sqrt(max(0, 1 - f * f))
     args += ["-draw", f"line {cx-half:.1f},{y:.1f} {cx+half:.1f},{y:.1f}"]
-tw, th = logo_h * 1.30, logo_h * 0.34
-args += ["-stroke", "none", "-fill", BG,
-         "-draw", f"rectangle {cx-tw/2:.1f},{cy-th/2:.1f} {cx+tw/2:.1f},{cy+th/2:.1f}"]
-args += ["-fill", FG, "-font", SANS_BOLD, "-pointsize", f"{logo_h*0.40:.0f}",
-         "-annotate", f"+{cx-tw/2+logo_h*0.02:.0f}+{cy+logo_h*0.14:.0f}", "LUMON"]
+# A halo around each glyph, not a rectangle: a rectangular knockout leaves its
+# own corners visible as dark blocks against the wireframe.
+mark_pt = logo_h * 0.34
+mark_w = mark_pt * 3.45          # "LUMON" in the bold cut, measured
+mark_pos = f"+{cx-mark_w/2:.0f}+{cy+mark_pt*0.36:.0f}"
+args += ["-font", SANS_BOLD, "-pointsize", f"{mark_pt:.0f}",
+         "-stroke", BG, "-strokewidth", f"{logo_h*0.05:.1f}", "-fill", BG,
+         "-annotate", mark_pos, "LUMON"]
+args += ["-stroke", "none", "-fill", FG, "-annotate", mark_pos, "LUMON"]
 
 # ---- bins -----------------------------------------------------------------
 bin_w = W / 5
-plate_w = bin_w * 0.75
-mouth_y = H - BUFFER * 0.75 - BUFFER * 0.14
-ph = BUFFER * 0.26
-args += ["-font", MONO]
+plate_w = bin_w * 0.74
+plate_h = 32
+stack_gap = 7
+bins_y = FIELD_BOTTOM + 22
+args += ["-font", SANS_BOLD]
 for i in range(5):
     px = i * bin_w + (bin_w - plate_w) / 2
-    args += ["-fill", BG, "-stroke", FG, "-strokewidth", "1",
-             "-draw", f"rectangle {px:.0f},{mouth_y:.0f} {px+plate_w:.0f},{mouth_y+ph:.0f}"]
-    args += ["-stroke", "none", "-fill", FG, "-pointsize", f"{BASE*0.62:.1f}",
-             "-annotate", f"+{px+plate_w/2-BASE*0.4:.0f}+{mouth_y+ph*0.72:.0f}", f"{i+1:02d}"]
-    by2 = mouth_y + ph + BUFFER * 0.06
-    args += ["-fill", BG, "-stroke", FG, "-strokewidth", "1",
-             "-draw", f"rectangle {px:.0f},{by2:.0f} {px+plate_w:.0f},{by2+ph:.0f}"]
-    args += ["-stroke", "none", "-fill", FG, "-pointsize", f"{BASE*0.5:.1f}",
-             "-annotate", f"+{px+5:.0f}+{by2+ph*0.72:.0f}", f"{int(PROGRESS*100)}%"]
+    args += ["-fill", BG, "-stroke", FG, "-strokewidth", "1.5",
+             "-draw", f"rectangle {px:.0f},{bins_y:.0f} {px+plate_w:.0f},{bins_y+plate_h:.0f}"]
+    args += ["-stroke", "none", "-fill", FG, "-pointsize", "24",
+             "-annotate", f"+{px+plate_w/2-15:.0f}+{bins_y+plate_h*0.72:.0f}", f"{i+1:02d}"]
+
+    by2 = bins_y + plate_h + stack_gap
+    args += ["-fill", BG, "-stroke", FG, "-strokewidth", "1.5",
+             "-draw", f"rectangle {px:.0f},{by2:.0f} {px+plate_w:.0f},{by2+plate_h:.0f}"]
+    fill_w = (plate_w - 3) * PROGRESS
+    if fill_w > 0:
+        args += ["-stroke", "none", "-fill", FG,
+                 "-draw", f"rectangle {px+1.5:.1f},{by2+1.5:.1f} {px+1.5+fill_w:.1f},{by2+plate_h-1.5:.1f}"]
+    # dark glyphs with a bright edge, so the figure survives on either ground
+    pos = f"+{px+10:.0f}+{by2+plate_h*0.72:.0f}"
+    args += ["-stroke", FG, "-strokewidth", "2.5", "-fill", BG, "-pointsize", "22",
+             "-annotate", pos, f"{int(PROGRESS*100)}%"]
+    args += ["-stroke", "none", "-fill", BG, "-annotate", pos, f"{int(PROGRESS*100)}%"]
 
 # ---- coordinates: plain text, no filled bar -------------------------------
 coords = "0x%06X : 0x%06X" % (random.getrandbits(24), random.getrandbits(24))
-args += ["-fill", FG, "-pointsize", f"{BASE*0.62:.1f}",
-         "-annotate", f"+{W/2 - len(coords)*BASE*0.19:.0f}+{H - BASE*0.35:.0f}", coords]
+args += ["-font", SANS_BOLD, "-stroke", "none", "-fill", FG, "-pointsize", "24",
+         "-annotate", f"+{W/2 - len(coords)*7.2:.0f}+{H - 24:.0f}", coords]
 
 out = sys.argv[1] if len(sys.argv) > 1 else "backgrounds/03-macrodata-refinement.png"
 args.append(out)
