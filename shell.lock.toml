@@ -1,0 +1,9 @@
+# Lumon lock surface. Colors stay inside the theme's cold institutional range;
+# Lumon has no warm tones, so even the error state resolves to a brighter blue
+# rather than a red.
+text             = "#d6e2ee"
+placeholder      = "#4d86b0"
+text-error       = "#f2fcff"
+border           = "#304860"
+border-active    = "#8bc9eb"
+border-error     = "#f2fcff"
