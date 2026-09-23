@@ -34,6 +34,7 @@ Omarchy's stock wallpaper behaviour. Without the plugin, this theme still works
 | `icons.theme` | Icon theme selection |
 | `backgrounds/` | Wallpapers |
 | `cursor/` | Pointer generator and installer |
+| `tools/` | Wallpaper generator |
 
 ## Pointer
 
