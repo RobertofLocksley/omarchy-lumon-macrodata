@@ -1,60 +1,51 @@
 # Lumon Macrodata
 
-An Omarchy 4 theme for a compliant Macrodata Refinement workstation, with an
-optional live Macrodata Refinement field in place of the wallpaper.
+An Omarchy 4 theme for a compliant Macrodata Refinement workstation.
 
 ```bash
 omarchy theme install https://github.com/RobertofLocksley/omarchy-lumon-macrodata
 ```
 
-> The repository name matters. `omarchy theme install` strips a leading
-> `omarchy-` and a trailing `-theme` to derive the installed directory name, so
-> this repo installs as `lumon-macrodata` — which is the slug the companion
-> plugin looks for. Renaming the repo breaks activation of the live field.
-
-## The live field (optional)
+## The live field
 
 Paired with
 [omarchy-mdr-background](https://github.com/RobertofLocksley/omarchy-mdr-background),
-this theme's desktop background becomes a working Macrodata Refinement terminal:
-digits fill the screen, "scary" ones swell and twitch in drifting clusters, and
-you can lasso a cluster into one of the five bins along the bottom.
+the desktop background becomes a working Macrodata Refinement terminal: digits
+fill the screen, "scary" ones swell and twitch in drifting clusters, and you can
+lasso a cluster into one of the five bins along the bottom.
 
 ```bash
 omarchy plugin add https://github.com/RobertofLocksley/omarchy-mdr-background
 ```
 
-The plugin reads the active theme and only draws the field under this one, so
-every other theme keeps Omarchy's stock wallpaper behaviour. Themes cannot ship
-Quickshell plugins themselves, which is why this is two pieces.
-
-**Without the plugin the theme still works** — you get the wallpapers instead.
+The plugin only draws the field under this theme; every other theme keeps
+Omarchy's stock wallpaper behaviour. Without the plugin, this theme still works
+— you get the wallpapers instead.
 
 ## Contents
 
 | File | Purpose |
 |---|---|
-| `colors.toml` | The palette. Omarchy derives terminal colors from this. |
+| `colors.toml` | The palette; Omarchy derives terminal colors from it |
 | `shell.lock.toml` | Lock screen text and border colors |
 | `keyboard.rgb` | Keyboard backlight color |
 | `hyprland.lua` | Border and presentation tuning |
 | `btop.theme`, `chromium.theme`, `neovim.lua`, `vscode.json` | App palettes |
 | `icons.theme` | Icon theme selection |
-| `backgrounds/` | Wallpapers, including a rendered refinement still |
+| `backgrounds/` | Wallpapers |
+| `cursor/` | Pointer generator and installer |
 
-Note that Omarchy 4 derives Alacritty, Ghostty, Kitty and Foot colors from
-`colors.toml` and actively rejects per-terminal files from installed themes, so
-none are shipped here.
+## Pointer
 
-## Provenance
+Omarchy themes cannot carry a cursor, so the Lumon pointer is installed
+separately:
 
-Built on Omarchy's own `lumon` theme (MIT, Basecamp) — see
-[basecamp/omarchy](https://github.com/basecamp/omarchy). Added on top:
-`shell.lock.toml`, `keyboard.rgb`, and `backgrounds/03-macrodata-refinement.png`,
-which is generated rather than captured.
+```bash
+./cursor/install.sh
+```
 
-Visual language derives from *Severance* (Apple TV+). Not affiliated with or
-endorsed by Apple or the show's producers.
+It follows the theme from then on — applied under this theme, reverting to the
+system default under any other. Requires `xorg-xcursorgen` and ImageMagick.
 
 ## The bins
 
@@ -66,3 +57,11 @@ endorsed by Apple or the show's producers.
 | `MA` | Malice | anger, a desire to do harm  |
 
 Please enjoy each color equally.
+
+## License
+
+MIT. Built on Omarchy's `lumon` theme, also MIT —
+[basecamp/omarchy](https://github.com/basecamp/omarchy).
+
+Visual language derives from *Severance* (Apple TV+). Not affiliated with or
+endorsed by Apple or the show's producers.
